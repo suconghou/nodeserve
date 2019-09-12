@@ -76,7 +76,7 @@ export default class {
             } catch (e) {
                 reject(e)
             } finally {
-                resolve(true);
+                resolve(false);
                 clearTimeout(t)
             }
         })

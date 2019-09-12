@@ -54,23 +54,14 @@ export default class extends servefns {
 
 
     private async middleware(req: requestctx, res: responsectx, pathname: string, query: querystring.ParsedUrlQuery) {
-        await this.runMiddleWare(req, res, pathname, query)
-        return req.ctx.run;
+        const ret = await this.runMiddleWare(req, res, pathname, query)
+        return ret && req.ctx.run;
     }
 
 
     private async route(req: requestctx, res: responsectx, pathname: string, query: querystring.ParsedUrlQuery) {
-        let ret: any;
-        try {
-            ret = await this.runRoute(req, res, pathname, query);
-        } catch (e) {
-            if (e !== true) {
-                throw e;
-            }
-            ret = false
-        } finally {
-            return ret && req.ctx.run;
-        }
+        const ret = await this.runRoute(req, res, pathname, query);
+        return ret && req.ctx.run;
     }
 
 

@@ -9,7 +9,10 @@ const opts = {
 const app = new serve();
 app.use('', log)
 app.use('', cors)
-app.use(/lib/, serve.static('./'))
+app.use(/^\/lib/, serve.static('./'))
+app.get(/^\/api/, async (req, res) => {
+    res.end("hello");
+})
 app.listen(opts.port, opts.host, () => {
     console.info('Server listening on port %d', opts.port)
 }).on('error', err => {
