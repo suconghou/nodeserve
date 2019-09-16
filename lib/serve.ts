@@ -81,30 +81,32 @@ export default class extends servefns {
     }
 
     private async runAfter(req: requestctx, res: responsectx, pathname: string, query: querystring.ParsedUrlQuery) {
-        try {
-            const m = this.getAfter(req.ctx.middlewares, req.method, pathname)
-            for (let i = 0, j = m.length; i < j; i++) {
-                const { handler, timeout } = m[i];
-                await new Promise((resolve, reject) => {
-                    const t = setTimeout(() => {
-                        reject(true)
-                    }, timeout);
-                    const next = () => {
-                        clearTimeout(t);
-                        resolve();
-                    }
-                    const stop = () => {
-                        clearTimeout(t);
-                        reject(true);
-                    }
-                    handler(req, res, next, stop)
-                });
-            }
-        } catch (e) {
-            if (e !== true) {
-                throw e;
+        const m = this.getAfter(req.ctx.middlewares, req.method, pathname)
+        for (let i = 0, j = m.length; i < j; i++) {
+            const { handler, timeout } = m[i];
+            const ret = await new Promise(async (resolve, reject) => {
+                const t = setTimeout(() => {
+                    resolve(false)
+                }, timeout);
+                const next = () => {
+                    clearTimeout(t);
+                    resolve(true);
+                }
+                const stop = () => {
+                    clearTimeout(t);
+                    resolve(false);
+                }
+                try {
+                    await handler(req, res, next, stop)
+                } catch (e) {
+                    reject(e)
+                }
+            });
+            if (ret === false) {
+                return false
             }
         }
+        return true
     }
 
 }
