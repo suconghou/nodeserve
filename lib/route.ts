@@ -39,7 +39,7 @@ export default class {
         return this;
     }
 
-    use(prefix: any = '', middleware: any, timeout: number = 5000, method: Array<string> = ["GET", "POST", "PUT", "DELETE", "HEAD", "PATCH", "OPTIONS"]) {
+    use(prefix: any = '', middleware: any = null, timeout: number = 5000, method: Array<string> = ["GET", "POST", "PUT", "DELETE", "HEAD", "PATCH", "OPTIONS"]) {
         let path = prefix;
         let handler = middleware;
         if (!handler) {

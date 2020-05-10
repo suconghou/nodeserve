@@ -19,7 +19,9 @@ export const cors = (request: requestctx, response: responsectx, next: Function)
 export const log = (request: requestctx, response: responsectx, next: Function) => {
     const start = Date.now();
     request.after((req: requestctx, res: responsectx, tonext: Function) => {
-        console.info(`${req.method} ${req.url} ${res.statusCode} ${Date.now() - start}`);
+        setTimeout(() => {
+            console.info(`${req.method} ${req.url} ${res.statusCode} ${Date.now() - start}`);
+        }, 0);
         tonext();
     })
     next();

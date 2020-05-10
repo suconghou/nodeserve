@@ -3,7 +3,7 @@ import * as http from 'http'
 
 import file from './file'
 import servefns from './servefns'
-import { requestctx, responsectx, middlewareItem } from '../types'
+import { requestctx, responsectx, middlewareItem, afterTask } from '../types'
 
 export default class extends servefns {
 
@@ -70,7 +70,7 @@ export default class extends servefns {
     }
 
     private getAfter(middlewareList: Array<middlewareItem>, m: string, uri: string) {
-        const middlewares = [];
+        const middlewares: Array<afterTask> = [];
         for (let i = 0, j = middlewareList.length; i < j; i++) {
             const { method, handler, path, timeout } = middlewareList[i];
             if (method.includes(m) && path.test(uri)) {

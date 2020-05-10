@@ -33,6 +33,11 @@ export interface resCtx {
 
 }
 
+export interface afterTask {
+    timeout: number
+    handler: Function,
+    params: RegExpMatchArray,
+}
 
 export interface requestctx extends http.IncomingMessage {
     body?: Function
@@ -46,6 +51,7 @@ export interface requestctx extends http.IncomingMessage {
 
 export interface responsectx extends http.ServerResponse {
     json?: Function
-    sendFile?: Function
+    file?: Function
+    send?: Function
 }
 

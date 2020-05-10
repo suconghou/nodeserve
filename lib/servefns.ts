@@ -29,7 +29,8 @@ export default class extends route {
         };
 
         res.json = this.sendJson(res);
-        res.sendFile = this.sendFile(req, res);
+        res.send = this.sendData(res)
+        res.file = this.sendFile(req, res);
 
     }
 
@@ -69,6 +70,16 @@ export default class extends route {
                 'Content-Length': str.length
             });
             return response.end(str);
+        }
+    }
+
+    private sendData(response: responsectx) {
+        return (data: string, type = 'text/html', status: number = 200) => {
+            response.writeHead(status, {
+                'Content-Type': type,
+                'Content-Length': data.length
+            });
+            return response.end(data);
         }
     }
 

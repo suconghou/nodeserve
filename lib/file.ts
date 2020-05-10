@@ -359,10 +359,9 @@ export default class {
 
     private static pipe(res: responsectx, info: any, file: string) {
         const { code, meta, start, end } = info
+        res.writeHead(code, meta);
         if (code == 304) {
-            res.writeHead(code, meta);
             return res.end();
-
         } else if (code == 206) {
             return fs.createReadStream(file, { start, end }).pipe(res);
         }
