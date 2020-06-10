@@ -67,7 +67,7 @@ export default class extends route {
             const str = JSON.stringify(data)
             response.writeHead(status, {
                 'Content-Type': 'application/json',
-                'Content-Length': str.length
+                'Content-Length': Buffer.byteLength(str,'utf8')
             });
             return response.end(str);
         }
@@ -77,7 +77,7 @@ export default class extends route {
         return (data: string, type = 'text/html', status: number = 200) => {
             response.writeHead(status, {
                 'Content-Type': type,
-                'Content-Length': data.length
+                'Content-Length': Buffer.byteLength(data,'utf8')
             });
             return response.end(data);
         }

@@ -29,10 +29,6 @@ export interface reqCtx {
     routes: Array<routeItem>
 }
 
-export interface resCtx {
-
-}
-
 export interface afterTask {
     timeout: number
     handler: Function,
