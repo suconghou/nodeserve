@@ -332,7 +332,18 @@ export default class {
         let matches = headers.range ? headers.range.trim().match(/^bytes=(\d+)-(\d+)?$/) : false
         if (matches) {
             const start = parseInt(matches[1]);
-            const end = matches[2] ? parseInt(matches[2]) : (stats.size - 1);
+            let end = matches[2] ? parseInt(matches[2]) : (stats.size - 1);
+            if (end >= stats.size) {
+                end = stats.size - 1;
+            }
+            if (start > end || start >= stats.size) {
+                return {
+                    code: 416,
+                    meta: {
+                        'Content-Length': 0
+                    }
+                }
+            }
             const len = end - start + 1;
             return {
                 code: 206,
@@ -360,7 +371,7 @@ export default class {
     private static pipe(res: responsectx, info: any, file: string) {
         const { code, meta, start, end } = info
         res.writeHead(code, meta);
-        if (code == 304) {
+        if (code == 304 || code == 416) {
             return res.end();
         } else if (code == 206) {
             return fs.createReadStream(file, { start, end }).pipe(res);
