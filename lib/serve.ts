@@ -1,4 +1,3 @@
-import * as querystring from 'querystring';
 import * as http from 'http'
 
 import file from './file'
@@ -21,7 +20,7 @@ export default class extends servefns {
 				if (!response.headersSent) {
 					response.writeHead(500);
 				}
-				if (!response.finished) {
+				if (!response.writableEnded) {
 					response.end(e.message || e.toString())
 				}
 			}
@@ -29,7 +28,7 @@ export default class extends servefns {
 				request.once('error', errhandler);
 				response.once('error', errhandler);
 				const [pathname, qs] = decodeURI(request.url).split('?');
-				const query = querystring.parse(qs);
+				const query = new URLSearchParams(qs);
 				this.buildctx(request, response, pathname, query);
 				let ret: any;
 				ret = await this.middleware(request, response, pathname, query);
@@ -53,19 +52,19 @@ export default class extends servefns {
 	}
 
 
-	private async middleware(req: requestctx, res: responsectx, pathname: string, query: querystring.ParsedUrlQuery) {
+	private async middleware(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
 		const ret = await this.runMiddleWare(req, res, pathname, query)
 		return ret && req.ctx.run;
 	}
 
 
-	private async route(req: requestctx, res: responsectx, pathname: string, query: querystring.ParsedUrlQuery) {
+	private async route(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
 		const ret = await this.runRoute(req, res, pathname, query);
 		return ret && req.ctx.run;
 	}
 
 
-	private servestatic(req: requestctx, res: responsectx, pathname: string, query: querystring.ParsedUrlQuery) {
+	private servestatic(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
 		return file.serve(req, res, pathname);
 	}
 
@@ -80,7 +79,7 @@ export default class extends servefns {
 		return middlewares;
 	}
 
-	private async runAfter(req: requestctx, res: responsectx, pathname: string, query: querystring.ParsedUrlQuery) {
+	private async runAfter(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
 		const m = this.getAfter(req.ctx.middlewares, req.method, pathname)
 		for (let i = 0, j = m.length; i < j; i++) {
 			const { handler, timeout } = m[i];

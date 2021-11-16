@@ -1,5 +1,4 @@
 import * as http from 'http';
-import * as querystring from 'querystring';
 
 export interface ServerConfig {
 	host: string;
@@ -40,7 +39,7 @@ export interface requestctx extends http.IncomingMessage {
 	json?: Function;
 	ctx?: reqCtx;
 	path?: string;
-	query?: querystring.ParsedUrlQuery;
+	query?: URLSearchParams;
 	after?: Function;
 }
 

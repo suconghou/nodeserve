@@ -1,7 +1,6 @@
 import * as http from 'http';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as querystring from 'querystring';
 
 import { fsStat } from '../util/fsutil';
 

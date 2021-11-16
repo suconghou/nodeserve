@@ -1,4 +1,3 @@
-import * as querystring from 'querystring';
 
 import { routeItem, middlewareItem, requestctx, responsectx } from '../types'
 
@@ -60,7 +59,7 @@ export default class {
 		return false;
 	}
 
-	protected async runRoute(req: requestctx, res: responsectx, pathname: string, query: querystring.ParsedUrlQuery) {
+	protected async runRoute(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
 		const m = this.match(req.method, pathname)
 		if (!m) {
 			return true
@@ -93,7 +92,7 @@ export default class {
 		return middlewares;
 	}
 
-	protected async runMiddleWare(req: requestctx, res: responsectx, pathname: string, query: querystring.ParsedUrlQuery) {
+	protected async runMiddleWare(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
 		const m = this.middlewareMatch(req.method, pathname)
 		req.ctx = {
 			params: [],

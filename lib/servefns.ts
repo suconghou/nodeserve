@@ -1,4 +1,3 @@
-import * as querystring from 'querystring';
 import * as http from 'http';
 import * as path from 'path';
 
@@ -11,7 +10,7 @@ export default class extends route {
 		super();
 	}
 
-	protected buildctx(req: requestctx, res: responsectx, pathname: string, query: querystring.ParsedUrlQuery) {
+	protected buildctx(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
 		req.path = pathname;
 		req.query = query;
 		req.body = this.body(req);
