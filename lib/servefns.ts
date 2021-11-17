@@ -1,6 +1,3 @@
-import * as http from 'http';
-import * as path from 'path';
-
 import route from './route';
 import file from './file';
 import { requestctx, responsectx } from '../types';
@@ -38,7 +35,7 @@ export default class extends route {
 	}
 
 	private body(request: requestctx) {
-		return async (max = 8192) => {
+		return async (max = 8192): Promise<Buffer> => {
 			return await new Promise((resolve, reject) => {
 				const buf = [];
 				let count = 0;

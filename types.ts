@@ -1,5 +1,7 @@
 import * as http from 'http';
 
+type readBodyFunction = (max?: number) => Promise<Buffer>;
+
 export interface ServerConfig {
 	host: string;
 	port: number;
@@ -35,7 +37,7 @@ export interface afterTask {
 }
 
 export interface requestctx extends http.IncomingMessage {
-	body?: Function;
+	body?: readBodyFunction;
 	json?: Function;
 	ctx?: reqCtx;
 	path?: string;
