@@ -1,13 +1,14 @@
+import * as http from 'http'
 import route from './route';
 import file from './file';
-import { requestctx, responsectx } from '../types';
+import { requestFns, requestctx, responseFns, responsectx } from '../types';
 
 export default class extends route {
 	constructor() {
 		super();
 	}
 
-	protected buildctx(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
+	protected buildctx(req: http.IncomingMessage & Partial<requestFns>, res: http.ServerResponse & Partial<responseFns>, pathname: string, query: URLSearchParams) {
 		req.path = pathname;
 		req.query = query;
 		req.body = this.body(req);
@@ -25,7 +26,9 @@ export default class extends route {
 				path = /^\//;
 				handler = prefix;
 			}
-			req.ctx.middlewares.push({ path, handler, timeout, method });
+			if (req.ctx) {
+				req.ctx.middlewares.push({ path, handler, timeout, method });
+			}
 			return req;
 		};
 
@@ -34,15 +37,15 @@ export default class extends route {
 		res.file = this.sendFile(req, res);
 	}
 
-	private body(request: requestctx) {
+	private body(request: http.IncomingMessage & Partial<requestFns>) {
 		return async (max = 8192): Promise<Buffer> => {
 			return await new Promise((resolve, reject) => {
-				const buf = [];
+				const buf: Array<Buffer> = [];
 				let count = 0;
 				request
 					.on('error', reject)
 					.on('aborted', reject)
-					.on('data', (data) => {
+					.on('data', (data: Buffer) => {
 						buf.push(data);
 						count += data.length;
 						if (count > max) {
@@ -56,7 +59,7 @@ export default class extends route {
 		};
 	}
 
-	private parseJson(request: requestctx) {
+	private parseJson(request: http.IncomingMessage & Partial<requestFns>) {
 		return async (max = 8192) => {
 			const bodyParser = this.body(request);
 			const buf = await bodyParser(max);
@@ -64,7 +67,7 @@ export default class extends route {
 		};
 	}
 
-	private sendJson(response: responsectx) {
+	private sendJson(response: http.ServerResponse) {
 		return (data: Record<string, unknown>, status = 200) => {
 			const str = JSON.stringify(data);
 			response.writeHead(status, {
@@ -75,7 +78,7 @@ export default class extends route {
 		};
 	}
 
-	private sendData(response: responsectx) {
+	private sendData(response: http.ServerResponse) {
 		return (data: string, type = 'text/html', status = 200) => {
 			response.writeHead(status, {
 				'Content-Type': type,
@@ -85,7 +88,7 @@ export default class extends route {
 		};
 	}
 
-	private sendFile(request: requestctx, response: responsectx) {
+	private sendFile(request: http.IncomingMessage, response: http.ServerResponse) {
 		return (filepath: string) => {
 			return file.serve(request, response, filepath, '.', '');
 		};
@@ -93,7 +96,7 @@ export default class extends route {
 
 	static static(dir: string) {
 		return async (request: requestctx, response: responsectx, next: Function, stop: Function) => {
-			return file.serve(request, response, request.path, dir) && stop();
+			return await file.serve(request, response, request.path, dir) && stop();
 		};
 	}
 }

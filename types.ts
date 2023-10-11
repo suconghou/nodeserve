@@ -23,8 +23,14 @@ export interface middlewareItem {
 	method: Array<string>;
 }
 
+export interface middlewareMatched {
+	handler: Function;
+	timeout: number;
+	params: RegExpMatchArray | null;
+}
+
 export interface reqCtx {
-	params: RegExpMatchArray;
+	params: RegExpMatchArray | null;
 	run: boolean;
 	middlewares: Array<middlewareItem>;
 	routes: Array<routeItem>;
@@ -33,20 +39,24 @@ export interface reqCtx {
 export interface afterTask {
 	timeout: number;
 	handler: Function;
-	params: RegExpMatchArray;
+	params: RegExpMatchArray | null;
 }
 
-export interface requestctx extends http.IncomingMessage {
-	body?: readBodyFunction;
-	json?: Function;
-	ctx?: reqCtx;
-	path?: string;
-	query?: URLSearchParams;
-	after?: Function;
+export type requestctx = http.IncomingMessage & requestFns
+
+export interface requestFns {
+	body: readBodyFunction;
+	json: Function;
+	ctx: reqCtx;
+	path: string;
+	query: URLSearchParams;
+	after: Function;
 }
 
-export interface responsectx extends http.ServerResponse {
-	json?: Function;
-	file?: Function;
-	send?: Function;
+export type responsectx = http.ServerResponse & responseFns
+
+export interface responseFns {
+	json: Function;
+	file: Function;
+	send: Function;
 }

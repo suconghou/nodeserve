@@ -1,5 +1,5 @@
 
-import { routeItem, middlewareItem, requestctx, responsectx } from '../types'
+import { routeItem, middlewareItem, requestctx, responsectx, middlewareMatched } from '../types'
 
 export default class {
 
@@ -60,12 +60,12 @@ export default class {
 	}
 
 	protected async runRoute(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
-		const m = this.match(req.method, pathname)
+		const m = this.match(req.method || 'GET', pathname)
 		if (!m) {
 			return true
 		}
 		const { fn, params, timeout } = m;
-		req.ctx.params = params
+		req.ctx.params = params;
 		return await new Promise(async (resolve, reject) => {
 			const t = setTimeout(() => {
 				resolve(false)
@@ -82,7 +82,7 @@ export default class {
 	}
 
 	private middlewareMatch(m: string, uri: string) {
-		const middlewares = [];
+		const middlewares: Array<middlewareMatched> = [];
 		for (let i = 0, j = this.middlewares.length; i < j; i++) {
 			const { method, handler, path, timeout } = this.middlewares[i];
 			if (method.includes(m) && (!path || path.test(uri))) {
@@ -93,9 +93,9 @@ export default class {
 	}
 
 	protected async runMiddleWare(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
-		const m = this.middlewareMatch(req.method, pathname)
+		const m = this.middlewareMatch(req.method || 'GET', pathname)
 		req.ctx = {
-			params: [],
+			params: null,
 			run: true,
 			middlewares: [],
 			routes: []

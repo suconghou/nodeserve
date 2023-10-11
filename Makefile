@@ -4,4 +4,4 @@ build:
 	node main.bundle.js
 
 ts:
-	tsc -m es6 -t ES2019 main.ts
+	tsc -m es6 -t ES2019 -moduleResolution node main.ts

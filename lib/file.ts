@@ -271,14 +271,14 @@ Object.keys(types).forEach((mimestr) => {
 
 const resolveMime = (filePath: string) => {
 	const t = filePath.split('.').pop();
-	const type = typesMap[t];
+	const type = typesMap[t || ''];
 	return type ? type : defaultMime;
 };
 
 export default class {
-	public static async serve(req: requestctx, res: responsectx, pathname: string, cwd = '.', index = 'index.html') {
+	public static async serve(req: http.IncomingMessage, res: http.ServerResponse, pathname: string, cwd = '.', index = 'index.html') {
 		const { text, code, stats, file } = await this.target(pathname, cwd, index);
-		if (code !== 200) {
+		if (!stats) {
 			res.writeHead(code, {
 				'Content-Type': 'text/plain',
 				'Content-Length': text.length,
@@ -307,7 +307,7 @@ export default class {
 		if (!stats || !stats.isFile()) {
 			return { text: '403 forbidden', code: 403 };
 		}
-		return { code: 200, stats, file };
+		return { code: 200, stats, file, text: '' };
 	}
 
 	private static info(headers: http.IncomingHttpHeaders, stats: fs.Stats, file: string) {
@@ -362,7 +362,7 @@ export default class {
 		};
 	}
 
-	private static pipe(res: responsectx, info: any, file: string) {
+	private static pipe(res: http.ServerResponse, info: any, file: string) {
 		const { code, meta, start, end } = info;
 		res.writeHead(code, meta);
 		if (code == 304 || code == 416) {

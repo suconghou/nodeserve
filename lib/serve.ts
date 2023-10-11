@@ -2,7 +2,7 @@ import * as http from 'http'
 
 import file from './file'
 import servefns from './servefns'
-import { requestctx, responsectx, middlewareItem, afterTask } from '../types'
+import { requestctx, responsectx, middlewareItem, afterTask, requestFns } from '../types'
 
 export default class extends servefns {
 
@@ -27,18 +27,18 @@ export default class extends servefns {
 			try {
 				request.once('error', errhandler);
 				response.once('error', errhandler);
-				const [pathname, qs] = decodeURI(request.url).split('?');
+				const [pathname, qs] = decodeURI(request.url || '').split('?');
 				const query = new URLSearchParams(qs);
 				this.buildctx(request, response, pathname, query);
 				let ret: any;
-				ret = await this.middleware(request, response, pathname, query);
+				ret = await this.middleware(request as requestctx, response as responsectx, pathname, query);
 				if (ret) {
-					ret = await this.route(request, response, pathname, query);
+					ret = await this.route(request as requestctx, response as responsectx, pathname, query);
 					if (ret) {
-						ret = await this.servestatic(request, response, pathname, query);
+						ret = await this.servestatic(request as requestctx, response as responsectx, pathname, query);
 					}
 				}
-				await this.runAfter(request, response, pathname, query);
+				await this.runAfter(request as requestctx, response as responsectx, pathname, query);
 			} catch (e) {
 				errhandler(e)
 			}
@@ -80,7 +80,7 @@ export default class extends servefns {
 	}
 
 	private async runAfter(req: requestctx, res: responsectx, pathname: string, query: URLSearchParams) {
-		const m = this.getAfter(req.ctx.middlewares, req.method, pathname)
+		const m = this.getAfter(req.ctx.middlewares, req.method || 'GET', pathname)
 		for (let i = 0, j = m.length; i < j; i++) {
 			const { handler, timeout } = m[i];
 			const ret = await new Promise(async (resolve, reject) => {
