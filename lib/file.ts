@@ -290,7 +290,12 @@ export default class {
 	}
 
 	private static async target(pathname: string, cwd = '.', index = 'index.html') {
+		const root = path.resolve(cwd);
 		let file = path.join(cwd, pathname);
+		// 解析后的真实路径必须仍在服务根目录内,拒绝 ../ 等路径穿越
+		if (file !== root && !path.resolve(file).startsWith(root + path.sep)) {
+			return { text: '403 forbidden', code: 403 };
+		}
 		if (file.endsWith('/')) {
 			file = path.join(file, index);
 		}
