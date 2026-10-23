@@ -6,7 +6,7 @@ import { fsStat } from '../util/fsutil';
 
 import { requestctx, responsectx } from '../types';
 
-const types = {
+const types: Record<string, string[]> = {
 	'application/andrew-inset': ['ez'],
 	'application/applixware': ['aw'],
 	'application/atom+xml': ['atom'],
@@ -259,7 +259,7 @@ const types = {
 	'video/webm': ['webm'],
 };
 
-const typesMap = {};
+const typesMap: Record<string, string> = {};
 const defaultMime = 'application/octet-stream';
 
 Object.keys(types).forEach((mimestr) => {
