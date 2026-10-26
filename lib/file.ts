@@ -372,9 +372,15 @@ export default class {
 		res.writeHead(code, meta);
 		if (code == 304 || code == 416) {
 			return res.end();
-		} else if (code == 206) {
-			return fs.createReadStream(file, { start, end }).pipe(res);
 		}
-		return fs.createReadStream(file).pipe(res);
+		// stat 之后文件可能被删/改名: 不监听 error 会让未捕获异常打崩整个进程
+		const stream = code == 206 ? fs.createReadStream(file, { start, end }) : fs.createReadStream(file);
+		stream.on('error', () => {
+			if (!res.headersSent) {
+				res.writeHead(500, { 'Content-Type': 'text/plain' });
+			}
+			res.end('500 internal error');
+		});
+		return stream.pipe(res);
 	}
 }
